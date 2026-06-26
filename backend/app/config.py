@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     
     # Tesseract path override (if needed on Windows)
     TESSERACT_CMD: str = Field(default="", env="TESSERACT_CMD")
+
+    # Optional Gemini integration key. Keep the real value in .env or deployment
+    # environment variables; never commit it to source control.
+    GEMINI_API_KEY: str = Field(default="", env="GEMINI_API_KEY")
     
     class Config:
         case_sensitive = True
