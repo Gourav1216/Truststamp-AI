@@ -4,7 +4,7 @@ import { apiUrl, ensureOk } from '../api';
 import { UploadCloud, CheckCircle, AlertTriangle, Cpu } from 'lucide-react';
 
 const FileUpload = ({ onAnalysisComplete }) => {
-  const { token, isDemoMode } = useAuth();
+  const { user, token, isDemoMode } = useAuth();
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [scanStep, setScanStep] = useState(0);
@@ -84,7 +84,8 @@ const FileUpload = ({ onAnalysisComplete }) => {
       return;
     }
 
-    if (isDemoMode) {
+    const isDemo = isDemoMode || (user && user.id === 'demo-user') || !token || token.startsWith('demo-token:');
+    if (isDemo) {
       setError("Document analysis needs the backend API. The deployed demo login works, but uploads require a hosted backend connected with VITE_API_BASE_URL.");
       return;
     }

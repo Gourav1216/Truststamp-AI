@@ -11,7 +11,12 @@ const isMissingBackendError = (message = '') => {
     normalized.includes('backend api is not connected') ||
     normalized.includes('not_found') ||
     normalized.includes('the page could not be found') ||
-    normalized.includes('/api/v1/')
+    normalized.includes('/api/v1/') ||
+    normalized.includes('failed to fetch') ||
+    normalized.includes('load failed') ||
+    normalized.includes('network error') ||
+    normalized.includes('networkerror') ||
+    normalized.includes('connection refused')
   );
 };
 

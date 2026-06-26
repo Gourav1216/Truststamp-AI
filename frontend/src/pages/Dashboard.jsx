@@ -5,7 +5,7 @@ import { apiUrl, ensureOk } from '../api';
 import { Search, Filter, FileText, Trash2, Calendar, AlertTriangle, Upload, ShieldCheck, ScanText, QrCode, FileSearch } from 'lucide-react';
 
 const Dashboard = ({ onSelectReport, onUploadClick }) => {
-  const { token, isDemoMode } = useAuth();
+  const { user, token, isDemoMode } = useAuth();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -13,7 +13,8 @@ const Dashboard = ({ onSelectReport, onUploadClick }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (isDemoMode) {
+    const isDemo = isDemoMode || (user && user.id === 'demo-user') || !token || token.startsWith('demo-token:');
+    if (isDemo) {
       setReports([]);
       setError(null);
       setLoading(false);
@@ -21,7 +22,7 @@ const Dashboard = ({ onSelectReport, onUploadClick }) => {
     }
 
     fetchReports();
-  }, [search, selectedRisk, isDemoMode]);
+  }, [search, selectedRisk, isDemoMode, user, token]);
 
   const fetchReports = async () => {
     try {
