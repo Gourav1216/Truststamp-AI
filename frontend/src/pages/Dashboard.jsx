@@ -5,7 +5,7 @@ import { apiUrl, ensureOk } from '../api';
 import { Search, Filter, FileText, Trash2, Calendar, AlertTriangle, Upload, ShieldCheck, ScanText, QrCode, FileSearch } from 'lucide-react';
 
 const Dashboard = ({ onSelectReport, onUploadClick }) => {
-  const { user, token, isDemoMode } = useAuth();
+  const { user, token, isDemoMode, getDemoReports, deleteDemoReport } = useAuth();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -15,7 +15,13 @@ const Dashboard = ({ onSelectReport, onUploadClick }) => {
   useEffect(() => {
     const isDemo = isDemoMode || (user && user.id === 'demo-user') || !token || token.startsWith('demo-token:');
     if (isDemo) {
-      setReports([]);
+      const demoData = getDemoReports();
+      const filtered = demoData.filter(r => {
+        const matchesSearch = !search || r.file_name.toLowerCase().includes(search.toLowerCase());
+        const matchesRisk = !selectedRisk || r.risk_category === selectedRisk;
+        return matchesSearch && matchesRisk;
+      });
+      setReports(filtered);
       setError(null);
       setLoading(false);
       return;
@@ -55,6 +61,13 @@ const Dashboard = ({ onSelectReport, onUploadClick }) => {
   const handleDelete = async (e, reportId) => {
     e.stopPropagation(); // Stop row click
     if (!window.confirm("Are you sure you want to delete this analysis report and its secure storage files?")) {
+      return;
+    }
+
+    const isDemo = isDemoMode || (user && user.id === 'demo-user') || !token || token.startsWith('demo-token:');
+    if (isDemo) {
+      deleteDemoReport(reportId);
+      setReports(reports.filter(r => r.id !== reportId));
       return;
     }
 

@@ -151,6 +151,36 @@ export const AuthProvider = ({ children }) => {
     setError(null);
   };
 
+  const getDemoReportsKey = () => `demo-reports:${user?.email || 'guest'}`;
+
+  const getDemoReports = () => {
+    try {
+      return JSON.parse(localStorage.getItem(getDemoReportsKey()) || '[]');
+    } catch {
+      return [];
+    }
+  };
+
+  const addDemoReport = (report) => {
+    try {
+      const reports = getDemoReports();
+      const updated = [report, ...reports];
+      localStorage.setItem(getDemoReportsKey(), JSON.stringify(updated));
+    } catch (err) {
+      console.error("Error saving demo report:", err);
+    }
+  };
+
+  const deleteDemoReport = (reportId) => {
+    try {
+      const reports = getDemoReports();
+      const updated = reports.filter(r => r.id !== reportId);
+      localStorage.setItem(getDemoReportsKey(), JSON.stringify(updated));
+    } catch (err) {
+      console.error("Error deleting demo report:", err);
+    }
+  };
+
   const value = {
     user,
     token,
@@ -159,6 +189,9 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    getDemoReports,
+    addDemoReport,
+    deleteDemoReport,
     isAuthenticated: !!user,
     isDemoMode: token?.startsWith(DEMO_TOKEN_PREFIX) || false
   };

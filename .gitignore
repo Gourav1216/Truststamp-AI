@@ -29,3 +29,5 @@ Thumbs.db
 
 # Vercel local metadata
 .vercel/
+
+.vercel

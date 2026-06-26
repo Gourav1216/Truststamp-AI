@@ -8,7 +8,7 @@ import { ArrowLeft, Calendar, Download, FileText, Hash, Printer, Trash2, ShieldA
 import confetti from 'canvas-confetti';
 
 const ReportPage = ({ reportId, onBack }) => {
-  const { token } = useAuth();
+  const { user, token } = useAuth();
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,6 +18,30 @@ const ReportPage = ({ reportId, onBack }) => {
   }, [reportId]);
 
   const fetchReportDetails = async () => {
+    const isDemo = token?.startsWith('demo-token:') || false;
+    if (isDemo) {
+      const key = `demo-reports:${user?.email || 'guest'}`;
+      try {
+        setLoading(true);
+        const demoData = JSON.parse(localStorage.getItem(key) || '[]');
+        const found = demoData.find(r => r.id === reportId);
+        if (found) {
+          setReport(found);
+          setError(null);
+          if (found.trust_score >= 81) {
+            triggerConfetti();
+          }
+        } else {
+          setError("Report not found in demo storage.");
+        }
+      } catch (err) {
+        setError("Failed to parse demo reports.");
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     try {
       setLoading(true);
       const response = await fetch(apiUrl(`/api/v1/reports/${reportId}`), {
@@ -53,6 +77,20 @@ const ReportPage = ({ reportId, onBack }) => {
 
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this verification report permanent?")) {
+      return;
+    }
+
+    const isDemo = token?.startsWith('demo-token:') || false;
+    if (isDemo) {
+      const key = `demo-reports:${user?.email || 'guest'}`;
+      try {
+        const demoData = JSON.parse(localStorage.getItem(key) || '[]');
+        const updated = demoData.filter(r => r.id !== report.id);
+        localStorage.setItem(key, JSON.stringify(updated));
+        onBack();
+      } catch (err) {
+        alert("Failed to delete demo report.");
+      }
       return;
     }
 
