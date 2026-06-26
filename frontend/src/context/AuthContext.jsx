@@ -5,6 +5,16 @@ const AuthContext = createContext(null);
 const DEMO_TOKEN_PREFIX = 'demo-token:';
 const DEMO_USER_KEY = 'demoUser';
 
+const isMissingBackendError = (message = '') => {
+  const normalized = message.toLowerCase();
+  return (
+    normalized.includes('backend api is not connected') ||
+    normalized.includes('not_found') ||
+    normalized.includes('the page could not be found') ||
+    normalized.includes('/api/v1/')
+  );
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -85,7 +95,7 @@ export const AuthProvider = ({ children }) => {
       setToken(access_token);
       return true;
     } catch (err) {
-      if (err.message.includes('backend API is not connected')) {
+      if (isMissingBackendError(err.message)) {
         startDemoSession(email);
         return true;
       }
@@ -117,7 +127,7 @@ export const AuthProvider = ({ children }) => {
       await login(email, password);
       return true;
     } catch (err) {
-      if (err.message.includes('backend API is not connected')) {
+      if (isMissingBackendError(err.message)) {
         startDemoSession(email, fullName);
         return true;
       }
