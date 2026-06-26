@@ -154,7 +154,8 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-    isAuthenticated: !!user
+    isAuthenticated: !!user,
+    isDemoMode: token?.startsWith(DEMO_TOKEN_PREFIX) || false
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
