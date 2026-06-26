@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend_data/uploads:/workspace/uploads
+      - ./backend_data/db:/workspace/db
+    environment:
+      - SECRET_KEY=secure_hackathon_token_stamp_5511#@!
+      - DATABASE_URL=sqlite:////workspace/db/truststamp.db
+      - UPLOAD_DIR=/workspace/uploads
+      - OVERLAY_DIR=/workspace/uploads/overlays
+    restart: always
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - BACKEND_URL=http://backend:8000
+    depends_on:
+      - backend
+    restart: always
