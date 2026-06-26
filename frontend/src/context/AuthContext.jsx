@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { apiUrl } from '../api';
+import { apiUrl, ensureOk } from '../api';
 
 const AuthContext = createContext(null);
+const DEMO_TOKEN_PREFIX = 'demo-token:';
+const DEMO_USER_KEY = 'demoUser';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -18,6 +20,14 @@ export const AuthProvider = ({ children }) => {
   }, [token]);
 
   const fetchUserProfile = async (authToken) => {
+    if (authToken?.startsWith(DEMO_TOKEN_PREFIX)) {
+      const demoUser = JSON.parse(localStorage.getItem(DEMO_USER_KEY) || 'null');
+      setUser(demoUser);
+      setError(null);
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch(apiUrl('/api/v1/auth/me'), {
         headers: {
@@ -25,7 +35,7 @@ export const AuthProvider = ({ children }) => {
         }
       });
       if (response.ok) {
-        const userData = await response.json();
+        const userData = await ensureOk(response);
         setUser(userData);
         setError(null);
       } else {
@@ -38,6 +48,21 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const startDemoSession = (email, fullName = 'TrustStamp Demo User') => {
+    const demoUser = {
+      id: 'demo-user',
+      email,
+      full_name: fullName,
+      created_at: new Date().toISOString(),
+      is_active: true
+    };
+    const demoToken = `${DEMO_TOKEN_PREFIX}${Date.now()}`;
+    localStorage.setItem(DEMO_USER_KEY, JSON.stringify(demoUser));
+    localStorage.setItem('token', demoToken);
+    setUser(demoUser);
+    setToken(demoToken);
   };
 
   const login = async (email, password) => {
@@ -55,18 +80,19 @@ export const AuthProvider = ({ children }) => {
         body: formData,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Login failed. Please verify credentials.');
-      }
-
-      const { access_token } = await response.json();
+      const { access_token } = await ensureOk(response, 'Login failed. Please verify credentials.');
       localStorage.setItem('token', access_token);
       setToken(access_token);
       return true;
     } catch (err) {
-      setError(err.message);
-      throw err;
+      if (err.message.includes('backend API is not connected')) {
+        startDemoSession(email);
+        return true;
+      }
+
+      const message = err.message || 'Login failed. Please verify credentials.';
+      setError(message);
+      throw new Error(message);
     }
   };
 
@@ -85,22 +111,26 @@ export const AuthProvider = ({ children }) => {
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Registration failed.');
-      }
+      await ensureOk(response, 'Registration failed.');
       
       // Auto login after successful registration
       await login(email, password);
       return true;
     } catch (err) {
-      setError(err.message);
-      throw err;
+      if (err.message.includes('backend API is not connected')) {
+        startDemoSession(email, fullName);
+        return true;
+      }
+
+      const message = err.message || 'Registration failed.';
+      setError(message);
+      throw new Error(message);
     }
   };
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem(DEMO_USER_KEY);
     setToken(null);
     setUser(null);
     setError(null);

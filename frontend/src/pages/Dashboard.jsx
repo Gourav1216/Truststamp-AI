@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import FileUpload from '../components/FileUpload';
+import { apiUrl, ensureOk } from '../api';
 import { Search, Filter, FileText, Trash2, Calendar, AlertTriangle, Upload, ShieldCheck, ScanText, QrCode, FileSearch } from 'lucide-react';
 
 const Dashboard = ({ onSelectReport, onUploadClick }) => {
@@ -27,17 +28,13 @@ const Dashboard = ({ onSelectReport, onUploadClick }) => {
         url += `?${params.join('&')}`;
       }
 
-      const response = await fetch(url, {
+      const response = await fetch(apiUrl(url), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to load reports history.");
-      }
-
-      const data = await response.json();
+      const data = await ensureOk(response, "Failed to load reports history.");
       setReports(data);
       setError(null);
     } catch (err) {
@@ -54,16 +51,14 @@ const Dashboard = ({ onSelectReport, onUploadClick }) => {
     }
 
     try {
-      const response = await fetch(`/api/v1/reports/${reportId}`, {
+      const response = await fetch(apiUrl(`/api/v1/reports/${reportId}`), {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to delete report.");
-      }
+      await ensureOk(response, "Failed to delete report.");
 
       // Remove from state
       setReports(reports.filter(r => r.id !== reportId));

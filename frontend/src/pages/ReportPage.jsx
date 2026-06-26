@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { apiUrl, ensureOk } from '../api';
 import TrustGauge from '../components/TrustGauge';
 import AnalysisDetails from '../components/AnalysisDetails';
 import ForensicViewer from '../components/ForensicViewer';
@@ -19,17 +20,13 @@ const ReportPage = ({ reportId, onBack }) => {
   const fetchReportDetails = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/v1/reports/${reportId}`, {
+      const response = await fetch(apiUrl(`/api/v1/reports/${reportId}`), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch report specifications.");
-      }
-
-      const data = await response.json();
+      const data = await ensureOk(response, "Failed to fetch report specifications.");
       setReport(data);
       setError(null);
 
@@ -60,16 +57,14 @@ const ReportPage = ({ reportId, onBack }) => {
     }
 
     try {
-      const response = await fetch(`/api/v1/reports/${report.id}`, {
+      const response = await fetch(apiUrl(`/api/v1/reports/${report.id}`), {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
-      if (!response.ok) {
-        throw new Error("Deletion request failed.");
-      }
+      await ensureOk(response, "Deletion request failed.");
 
       onBack(); // Return to dashboard
     } catch (err) {

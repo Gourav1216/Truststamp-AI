@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { apiUrl, ensureOk } from '../api';
 import { UploadCloud, CheckCircle, AlertTriangle, Cpu } from 'lucide-react';
 
 const FileUpload = ({ onAnalysisComplete }) => {
@@ -92,7 +93,7 @@ const FileUpload = ({ onAnalysisComplete }) => {
     formData.append("file", file);
 
     try {
-      const response = await fetch('/api/v1/verify/upload', {
+      const response = await fetch(apiUrl('/api/v1/verify/upload'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -100,22 +101,7 @@ const FileUpload = ({ onAnalysisComplete }) => {
         body: formData
       });
 
-      const readResponse = async () => {
-        const contentType = response.headers.get('content-type') || '';
-        if (contentType.includes('application/json')) {
-          return response.json();
-        }
-
-        const text = await response.text();
-        return { detail: text || response.statusText };
-      };
-
-      if (!response.ok) {
-        const errData = await readResponse();
-        throw new Error(errData.detail || `Verification pipeline failed (${response.status}).`);
-      }
-
-      const report = await readResponse();
+      const report = await ensureOk(response, `Verification pipeline failed (${response.status}).`);
       setScanProgress(100);
       setScanStep(scanSteps.length - 1);
       
