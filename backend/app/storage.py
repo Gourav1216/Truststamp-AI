@@ -2,7 +2,7 @@ import os
 import uuid
 import shutil
 from fastapi import UploadFile
-from backend.app.config import settings
+from .config import settings
 
 class SecureStorage:
     @staticmethod

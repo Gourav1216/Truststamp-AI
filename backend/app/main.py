@@ -8,13 +8,13 @@ from datetime import datetime
 from typing import List, Optional
 
 # App Imports
-from backend.app.config import settings
-from backend.app.database import engine, Base, get_db
-from backend.app.models import User, Document, AnalysisReport, AuditLog
-from backend.app.schemas import UserCreate, UserLogin, UserOut, Token, DocumentOut, AnalysisReportOut, ReportSummary
-from backend.app.auth import get_password_hash, verify_password, create_access_token, get_current_user
-from backend.app.storage import SecureStorage
-from backend.app.services.pipeline import VerificationPipeline
+from .config import settings
+from .database import engine, Base, get_db
+from .models import User, Document, AnalysisReport, AuditLog
+from .schemas import UserCreate, UserLogin, UserOut, Token, DocumentOut, AnalysisReportOut, ReportSummary
+from .auth import get_password_hash, verify_password, create_access_token, get_current_user
+from .storage import SecureStorage
+from .services.pipeline import VerificationPipeline
 
 # Initialize database tables
 Base.metadata.create_all(bind=engine)

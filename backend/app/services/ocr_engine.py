@@ -3,7 +3,7 @@ import os
 import pytesseract
 from PIL import Image
 import pdfplumber
-from backend.app.config import settings
+from ..config import settings
 
 class OCREngine:
     def __init__(self):

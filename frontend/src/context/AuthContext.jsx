@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { apiUrl } from '../api';
 
 const AuthContext = createContext(null);
 
@@ -18,7 +19,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUserProfile = async (authToken) => {
     try {
-      const response = await fetch('/api/v1/auth/me', {
+      const response = await fetch(apiUrl('/api/v1/auth/me'), {
         headers: {
           'Authorization': `Bearer ${authToken}`
         }
@@ -46,7 +47,7 @@ export const AuthProvider = ({ children }) => {
       formData.append('username', email); // FastAPI OAuth2 uses 'username'
       formData.append('password', password);
 
-      const response = await fetch('/api/v1/auth/login', {
+      const response = await fetch(apiUrl('/api/v1/auth/login'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -72,12 +73,12 @@ export const AuthProvider = ({ children }) => {
   const register = async (fullName, email, password) => {
     setError(null);
     try {
-      const response = await fetch('/api/v1/auth/register', {
+      const response = await fetch(apiUrl('/api/v1/auth/register'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: json_stringify_safely({
+        body: JSON.stringify({
           full_name: fullName,
           email,
           password
@@ -104,9 +105,6 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setError(null);
   };
-
-  // Helper utility for safe JSON stringifying
-  const json_stringify_safely = (data) => JSON.stringify(data);
 
   const value = {
     user,

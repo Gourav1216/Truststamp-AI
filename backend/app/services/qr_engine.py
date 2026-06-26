@@ -2,7 +2,7 @@ import os
 import cv2
 import json
 import urllib.parse
-from backend.app.config import settings
+from ..config import settings
 
 class QREngine:
     def decode_and_verify(self, file_path: str, ocr_fields: dict) -> dict:

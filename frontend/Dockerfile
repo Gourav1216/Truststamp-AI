@@ -17,4 +17,4 @@ EXPOSE 3000
 ENV BACKEND_URL=http://backend:8000
 
 # Start Vite dev server on host map
-CMD ["npm", "run", "dev", "--", "--host", "3000"]
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

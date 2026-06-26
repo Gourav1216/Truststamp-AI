@@ -1,5 +1,5 @@
 import os
-from backend.app.config import settings
+from ..config import settings
 
 class ExplainableEngine:
     def evaluate_risk(self, file_path: str, ocr: dict, metadata: dict, forensics: dict, qr: dict) -> dict:

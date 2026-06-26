@@ -2,8 +2,8 @@ import os
 import cv2
 import numpy as np
 from PIL import Image, ImageChops
-from backend.app.config import settings
-from backend.app.storage import SecureStorage
+from ..config import settings
+from ..storage import SecureStorage
 
 class ForensicsEngine:
     def perform_forensics(self, file_path: str, mime_type: str) -> dict:

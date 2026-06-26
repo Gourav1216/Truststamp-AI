@@ -18,7 +18,7 @@ const Login = () => {
 
     try {
       if (isRegister) {
-        if (!fullName.strip_safely()) {
+        if (!fullName.trim()) {
           throw new Error("Full Name is required.");
         }
         await register(fullName, email, password);
@@ -30,11 +30,6 @@ const Login = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Safe string check helper
-  String.prototype.strip_safely = function() {
-    return this.trim();
   };
 
   return (
@@ -109,7 +104,7 @@ const Login = () => {
               <Lock size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
               <input
                 type="password"
-                placeholder="••••••••"
+                placeholder="********"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="input-field"
@@ -150,7 +145,7 @@ const Login = () => {
 
         {/* Mock/Demo Helper */}
         <div style={{ marginTop: '1.5rem', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-glass)', borderRadius: '6px', fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center' }}>
-          💡 Hackathon Demo: registers/logs in instantly with any username & password (min. 6 chars).
+          Hackathon Demo: create an account with any email and a password of at least 6 characters.
         </div>
 
       </div>

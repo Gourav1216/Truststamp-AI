@@ -1,8 +1,8 @@
-from backend.app.services.ocr_engine import OCREngine
-from backend.app.services.metadata_engine import MetadataEngine
-from backend.app.services.forensics_engine import ForensicsEngine
-from backend.app.services.qr_engine import QREngine
-from backend.app.services.explainable_engine import ExplainableEngine
+from .ocr_engine import OCREngine
+from .metadata_engine import MetadataEngine
+from .forensics_engine import ForensicsEngine
+from .qr_engine import QREngine
+from .explainable_engine import ExplainableEngine
 
 class VerificationPipeline:
     def __init__(self):
